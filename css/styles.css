@@ -10970,3 +10970,35 @@ section.resume-section .resume-section-content {
     padding-bottom: 5rem;
   }
 }
+/* Services card */
+.services-card {
+  background: linear-gradient(135deg, #1d2b3a 0%, #0f1722 100%);
+  color: #f1f1f1;
+}
+.services-card h3,
+.services-card h4,
+.services-card h5 {
+  color: #ffffff;
+}
+.services-card p {
+  color: #c9d1d9;
+}
+.services-tagline {
+  color: #c9d1d9;
+}
+.services-avatar {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border: 2px solid #457b9d;
+}
+.services-icon {
+  font-size: 1.4rem;
+}
+.services-contact {
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+.services-footnote {
+  color: #9aa7b4;
+  font-size: 0.9rem;
+}
