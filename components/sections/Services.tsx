@@ -25,27 +25,35 @@ const serviceIcons: Record<
   systems: FaDesktop,
 };
 
+type DownloadStatus = "idle" | "working" | "done" | "error";
+
 export function Services() {
-  const [downloading, setDownloading] = useState(false);
+  const [status, setStatus] = useState<DownloadStatus>("idle");
 
   async function downloadCard() {
     const card = document.getElementById("servicesCard");
-    if (!card) return;
+    if (!card || status === "working") return;
 
-    setDownloading(true);
+    setStatus("working");
     try {
-      const html2canvas = (await import("html2canvas")).default;
+      const html2canvas = (await import("html2canvas-pro")).default;
       const canvas = await html2canvas(card, {
         scale: 2,
         useCORS: true,
         backgroundColor: "#163445",
+        logging: false,
       });
       const link = document.createElement("a");
       link.download = "jhon-acevedo-servicios.png";
       link.href = canvas.toDataURL("image/png");
+      document.body.appendChild(link);
       link.click();
-    } finally {
-      setDownloading(false);
+      link.remove();
+      setStatus("done");
+      window.setTimeout(() => setStatus("idle"), 2500);
+    } catch (error) {
+      console.error(error);
+      setStatus("error");
     }
   }
 
@@ -104,11 +112,17 @@ export function Services() {
         <button
           type="button"
           onClick={downloadCard}
-          disabled={downloading}
+          disabled={status === "working"}
           className="inline-flex items-center gap-2 rounded-full border border-brand px-5 py-2.5 font-medium text-brand transition-colors hover:bg-brand hover:text-white disabled:cursor-wait disabled:opacity-70"
         >
           <FaDownload />
-          {downloading ? "Generando imagen..." : "Descargar como imagen"}
+          {status === "working"
+            ? "Generando imagen..."
+            : status === "done"
+              ? "Imagen descargada"
+              : status === "error"
+                ? "Error al generar. Reintenta"
+                : "Descargar como imagen"}
         </button>
       </div>
     </Section>

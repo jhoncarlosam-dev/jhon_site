@@ -10,7 +10,7 @@ Sitio en producción: [https://ac3.netlify.app/](https://ac3.netlify.app/)
 - React + TypeScript
 - Tailwind CSS
 - react-icons
-- html2canvas (descarga de la tarjeta de servicios)
+- html2canvas-pro (descarga de la tarjeta de servicios)
 
 ## Desarrollo local
 
