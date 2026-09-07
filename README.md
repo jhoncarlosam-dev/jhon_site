@@ -1,52 +1,41 @@
+# Portafolio Web — Jhon Acevedo
 
-# 💻 Portafolio Web
+Currículum y portafolio de [Jhon Carlos Acevedo](https://github.com/jhoncarlosam-dev), migrado a **Next.js**, **React** y **Tailwind CSS**.
 
-Bienvenido a mi portafolio web, un proyecto donde presento parte de mi trabajo y habilidades en desarrollo front-end.  
-Esta página fue creada con HTML, CSS y JavaScript, buscando una estructura clara y responsive para mostrar proyectos de manera eficiente.
+Sitio en producción: [https://ac3.netlify.app/](https://ac3.netlify.app/)
 
-🌐 **Puedes visitarlo aquí:**  
-[https://ac3.netlify.app/](https://ac3.netlify.app/)
+## Tecnologías
 
----
+- Next.js (App Router, export estático)
+- React + TypeScript
+- Tailwind CSS
+- react-icons
+- html2canvas (descarga de la tarjeta de servicios)
 
-## 🚀 Tecnologías utilizadas
+## Desarrollo local
 
-- HTML5
-- CSS3
-- JavaScript
-
----
-
-## 📂 Estructura del proyecto
-
-```
-├── assets/      # Imágenes y recursos multimedia
-├── css/         # Hojas de estilo personalizadas
-├── js/          # Archivos JavaScript para interactividad
-└── index.html   # Página principal del sitio
+```bash
+npm install
+npm run dev
 ```
 
----
+Abre [http://localhost:3000](http://localhost:3000).
 
-## 🔥 Objetivo
+## Build estático
 
-El objetivo de este portafolio es mostrar de forma sencilla y directa algunos de mis proyectos y habilidades como desarrollador web, y facilitar a clientes o colaboradores conocer mi trabajo.
+```bash
+npm run build
+```
 
----
+El sitio se genera en `out/` y se publica en Netlify (`publish = out`).
 
-## 🧠 Autor
+## Contenido
+
+El texto del currículum está en [`data/resume.ts`](data/resume.ts). Las secciones se renderizan desde [`app/page.tsx`](app/page.tsx).
+
+## Autor
 
 Desarrollado por [Jhon Carlos](https://github.com/jhoncarlosam-dev).
 
----
-
-## 💡 Contacto
-
-Si deseas conocer más sobre mi trabajo o colaborar, no dudes en escribirme:  
-
-📧 **Correo:** jhoncarlosam.dev@gmail.com  
-💼 **GitHub:** [jhoncarlosam-dev](https://github.com/jhoncarlosam-dev)
-
----
-
-Gracias por visitar mi portafolio 🚀
+- Correo: jhoncarlosam.dev@gmail.com
+- GitHub: [jhoncarlosam-dev](https://github.com/jhoncarlosam-dev)

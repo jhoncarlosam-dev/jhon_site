@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-navy: #163445;
+  --color-navy-deep: #102a38;
+  --color-brand: #457b9d;
+  --color-brand-dark: #356480;
+  --color-sand: #f4f1ec;
+  --color-ink: #1c2833;
+  --color-muted: #5a6a75;
+  --color-card: #ffffff;
+  --color-line: #e4ddd4;
+  --color-whatsapp: #1f9d55;
+  --font-display: var(--font-saira);
+  --font-sans: var(--font-dm-sans);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-sand);
+  color: var(--color-ink);
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+}
+
+::selection {
+  background: #c5d9e4;
+}
+
+.services-card {
+  background-color: #163445;
+  color: #ffffff;
+}
+
+.services-card-accent {
+  color: #a8dadc;
+}
+
+.services-card-muted {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.services-card-faint {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.services-whatsapp {
+  background-color: #1f9d55;
+  color: #ffffff;
+}
