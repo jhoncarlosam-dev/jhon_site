@@ -3,8 +3,8 @@ import { Section, SectionHeading } from "@/components/Section";
 
 export function Experience() {
   return (
-    <Section id="experience">
-      <SectionHeading>Experience</SectionHeading>
+    <Section id="experiencia">
+      <SectionHeading eyebrow="De dónde vengo">Experiencia</SectionHeading>
       <ol className="relative space-y-8 border-l border-line pl-6">
         {resume.experience.map((job) => (
           <li key={`${job.title}-${job.company}`} className="relative">

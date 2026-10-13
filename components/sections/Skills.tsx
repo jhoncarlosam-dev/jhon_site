@@ -12,16 +12,21 @@ import {
   FaReact,
 } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa6";
+import { SiNextdotjs } from "react-icons/si";
 import { resume } from "@/data/resume";
 import { Section, SectionHeading } from "@/components/Section";
 import type { SkillIcon } from "@/data/resume";
 
-const skillIconMap: Record<SkillIcon["icon"], ComponentType<{ className?: string }>> = {
+const skillIconMap: Record<
+  SkillIcon["icon"],
+  ComponentType<{ className?: string }>
+> = {
   html5: FaHtml5,
   css3: FaCss3Alt,
   js: FaJsSquare,
   angular: FaAngular,
   react: FaReact,
+  next: SiNextdotjs,
   node: FaNodeJs,
   npm: FaNpm,
   git: FaGitAlt,
@@ -31,11 +36,8 @@ const skillIconMap: Record<SkillIcon["icon"], ComponentType<{ className?: string
 
 export function Skills() {
   return (
-    <Section id="skills">
-      <SectionHeading>Skills</SectionHeading>
-      <h3 className="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-muted">
-        Programming Languages & Tools
-      </h3>
+    <Section id="stack">
+      <SectionHeading eyebrow="Con qué construyo">Stack</SectionHeading>
       <ul className="mb-8 flex flex-wrap gap-4">
         {resume.skillIcons.map((skill) => {
           const Icon = skillIconMap[skill.icon];
@@ -61,9 +63,6 @@ export function Skills() {
           </li>
         ))}
       </ul>
-      <h3 className="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-muted">
-        Workflow
-      </h3>
       <ul className="grid gap-3 sm:grid-cols-2">
         {resume.workflow.map((item) => (
           <li

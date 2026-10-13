@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     title: resume.title,
     description: resume.description,
     type: "website",
-    locale: "en_US",
+    locale: "es_CO",
     images: [
       {
         url: resume.profileImageFallback,
@@ -40,7 +40,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="es"
       className={`${dmSans.variable} ${saira.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-sand font-sans text-ink">{children}</body>

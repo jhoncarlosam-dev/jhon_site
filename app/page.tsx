@@ -1,12 +1,12 @@
 import { Sidebar } from "@/components/Sidebar";
 import { About } from "@/components/sections/About";
-import { Awards } from "@/components/sections/Awards";
+import { Contact } from "@/components/sections/Contact";
 import { Education } from "@/components/sections/Education";
 import { Experience } from "@/components/sections/Experience";
-import { Interests } from "@/components/sections/Interests";
-import { Languages } from "@/components/sections/Languages";
-import { Services } from "@/components/sections/Services";
+import { Offers } from "@/components/sections/Offers";
+import { Process } from "@/components/sections/Process";
 import { Skills } from "@/components/sections/Skills";
+import { Work } from "@/components/sections/Work";
 
 export default function Home() {
   return (
@@ -14,13 +14,13 @@ export default function Home() {
       <Sidebar />
       <main className="pt-16 lg:pl-72 lg:pt-0">
         <About />
+        <Offers />
+        <Work />
+        <Process />
         <Experience />
-        <Education />
         <Skills />
-        <Languages />
-        <Services />
-        <Interests />
-        <Awards />
+        <Education />
+        <Contact />
       </main>
     </div>
   );
