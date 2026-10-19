@@ -12,7 +12,7 @@ import {
   FaReact,
 } from "react-icons/fa";
 import { FaCheck } from "react-icons/fa6";
-import { SiNextdotjs } from "react-icons/si";
+import { SiNextdotjs, SiPython } from "react-icons/si";
 import { resume } from "@/data/resume";
 import { Section, SectionHeading } from "@/components/Section";
 import type { SkillIcon } from "@/data/resume";
@@ -32,6 +32,7 @@ const skillIconMap: Record<
   git: FaGitAlt,
   database: FaDatabase,
   laravel: FaLaravel,
+  python: SiPython,
 };
 
 export function Skills() {

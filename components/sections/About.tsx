@@ -33,10 +33,16 @@ export function About() {
           {resume.whatsapp.label}
         </a>
         <a
-          href="#ofertas"
+          href="#proyectos"
           className="inline-flex items-center rounded-full border border-brand px-5 py-3 font-medium text-brand hover:bg-brand hover:text-white"
         >
-          Ver ofertas
+          Ver proyectos
+        </a>
+        <a
+          href={`mailto:${resume.email}`}
+          className="inline-flex items-center rounded-full border border-navy/15 px-5 py-3 font-medium text-navy hover:border-navy"
+        >
+          Correo
         </a>
       </div>
       <p className="mb-6 text-sm text-muted">{resume.languagesNote}</p>
