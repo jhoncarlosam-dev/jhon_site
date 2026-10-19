@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { FaBars, FaTimes, FaWhatsapp } from "react-icons/fa";
+import { FaBars, FaEnvelope, FaTimes } from "react-icons/fa";
 import { resume } from "@/data/resume";
 
 export function Sidebar() {
@@ -95,7 +95,7 @@ export function Sidebar() {
           {resume.name} <span className="text-[#a8dadc]">{resume.lastName}</span>
         </p>
         <p className="mb-8 hidden text-center text-xs uppercase tracking-[0.14em] text-white/60 lg:block">
-          Fullstack freelance
+          {resume.roleShort}
         </p>
         <ul className="flex w-full flex-col gap-1">
           {resume.nav.map((item) => {
@@ -118,14 +118,12 @@ export function Sidebar() {
           })}
         </ul>
         <a
-          href={resume.whatsapp.href}
-          target="_blank"
-          rel="noopener noreferrer"
+          href={`mailto:${resume.email}`}
           onClick={closeMenu}
           className="mt-auto inline-flex items-center justify-center gap-2 rounded-full bg-whatsapp px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90"
         >
-          <FaWhatsapp />
-          Pedir una cotización
+          <FaEnvelope />
+          Escribirme
         </a>
       </nav>
     </>

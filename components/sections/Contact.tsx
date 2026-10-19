@@ -8,8 +8,8 @@ export function Contact() {
     <Section id="contacto">
       <SectionHeading eyebrow="Hablemos">Contacto</SectionHeading>
       <p className="mb-8 max-w-xl text-lg leading-relaxed text-muted">
-        Si tienes un negocio en Arboledas, Cúcuta o cerca y solo existes en
-        Instagram, escríbeme. Te digo si te sirve una página nueva o un rediseño.
+        Busco un rol de desarrollo backend, con teletrabajo. Si el equipo trabaja
+        con Python y bases relacionales, escribe al correo o por WhatsApp.
       </p>
       <a
         href={resume.whatsapp.href}

@@ -4,7 +4,7 @@ import { Section, SectionHeading } from "@/components/Section";
 export function Experience() {
   return (
     <Section id="experiencia">
-      <SectionHeading eyebrow="De dónde vengo">Experiencia</SectionHeading>
+      <SectionHeading eyebrow="Trabajo pagado">Experiencia</SectionHeading>
       <ol className="relative space-y-8 border-l border-line pl-6">
         {resume.experience.map((job) => (
           <li key={`${job.title}-${job.company}`} className="relative">
@@ -21,7 +21,14 @@ export function Experience() {
                   {job.period}
                 </p>
               </div>
-              <p className="leading-relaxed text-muted">{job.description}</p>
+              <ul className="space-y-2 leading-relaxed text-muted">
+                {job.description.map((item) => (
+                  <li key={item} className="flex gap-2">
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </article>
           </li>
         ))}
