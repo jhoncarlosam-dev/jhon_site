@@ -17,7 +17,7 @@ El texto (ofertas, caso Café Marrón, experiencia) está en [`data/resume.ts`](
 
 La ruta `/chat` es una pantalla simple para conversar desde el teléfono, por texto o micrófono.
 
-En producción: [https://ac3.netlify.app/chat](https://ac3.netlify.app/chat). En el celular, ábrela en Chrome o Safari y agrégala a la pantalla de inicio.
+En producción: [https://ac3.netlify.app/chat](https://ac3.netlify.app/chat). En el motorola edge 60 fusion ábrela con Chrome (el navegador del teléfono) y agrégala a la pantalla de inicio. La pantalla es curva y 20:9: los controles quedan lejos del borde y el teclado no tapa el mensaje.
 
 1. Crea una clave en [console.x.ai](https://console.x.ai).
 2. Pégala en Ajustes. Queda en ese navegador; el sitio no la recibe.

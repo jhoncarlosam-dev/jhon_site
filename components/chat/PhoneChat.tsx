@@ -25,6 +25,7 @@ import {
   requestReply,
   speakableText,
 } from "@/lib/grok-chat";
+import { fallbackSpeechLang, SPEECH_LANGS } from "@/lib/speech-lang";
 
 type SpeechResult = {
   readonly 0?: { readonly transcript?: string };
@@ -57,7 +58,10 @@ function recognitionCtor(): (new () => BrowserSpeechRecognition) | null {
 function speechError(code: string): string | null {
   if (code === "aborted" || code === "no-speech") return null;
   if (code === "not-allowed" || code === "service-not-allowed") {
-    return "El celular bloqueó el micrófono. Actívalo en los ajustes del navegador.";
+    return "Chrome bloqueó el micrófono. Toca el candado de la barra y permite el micrófono.";
+  }
+  if (code === "language-not-supported") {
+    return "Este Chrome no transcribe español. Puedes escribir.";
   }
   if (code === "audio-capture") return "No encontré un micrófono en este celular.";
   if (code === "network") return "El reconocimiento de voz necesita conexión.";
@@ -68,10 +72,34 @@ function pickSpanishVoice(): SpeechSynthesisVoice | null {
   const voices = window.speechSynthesis?.getVoices() ?? [];
   return (
     voices.find((voice) => voice.lang.toLowerCase().startsWith("es-co")) ??
+    voices.find((voice) => voice.lang.toLowerCase().startsWith("es-419")) ??
+    voices.find((voice) => voice.lang.toLowerCase().startsWith("es-mx")) ??
     voices.find((voice) => voice.lang.toLowerCase().startsWith("es-")) ??
     voices.find((voice) => voice.lang.toLowerCase().startsWith("es")) ??
     null
   );
+}
+
+const sideInset = {
+  paddingLeft: "max(1.5rem, env(safe-area-inset-left))",
+  paddingRight: "max(1.5rem, env(safe-area-inset-right))",
+};
+
+let speechKeepAlive = 0;
+
+function stopSpeechKeepAlive() {
+  if (!speechKeepAlive) return;
+  window.clearInterval(speechKeepAlive);
+  speechKeepAlive = 0;
+}
+
+function primeSpeech() {
+  const synth = window.speechSynthesis;
+  if (!synth) return;
+  const primer = new SpeechSynthesisUtterance(" ");
+  primer.volume = 0;
+  primer.lang = "es-CO";
+  synth.speak(primer);
 }
 
 export function PhoneChat() {
@@ -94,6 +122,8 @@ export function PhoneChat() {
   const recognitionRef = useRef<BrowserSpeechRecognition | null>(null);
   const sendOnEndRef = useRef(false);
   const mountedRef = useRef(true);
+  const historyMarker = useRef(false);
+  const closeSettingsRef = useRef<() => void>(() => {});
 
   const showSettings = settingsOpen || (store.ready && store.apiKey === "" && !setupDismissed);
 
@@ -102,14 +132,32 @@ export function PhoneChat() {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/hablar-sw.js").catch(() => {});
     }
+    window.speechSynthesis?.getVoices();
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       mountedRef.current = false;
       document.body.style.overflow = previousOverflow;
       recognitionRef.current?.abort();
+      stopSpeechKeepAlive();
       window.speechSynthesis?.cancel();
     };
+  }, []);
+
+  useEffect(() => {
+    if (!showSettings || historyMarker.current) return;
+    history.pushState({ hablarAjustes: true }, "");
+    historyMarker.current = true;
+  }, [showSettings]);
+
+  useEffect(() => {
+    const onPop = () => {
+      historyMarker.current = false;
+      setSettingsOpen(false);
+      setSetupDismissed(true);
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
   }, []);
 
   useEffect(() => {
@@ -136,12 +184,10 @@ export function PhoneChat() {
 
   useEffect(() => {
     if (!showSettings) return;
-    keyInputRef.current?.focus();
+    const narrow = window.matchMedia("(max-width: 640px)").matches;
+    if (!narrow) keyInputRef.current?.focus();
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setSettingsOpen(false);
-        setSetupDismissed(true);
-      }
+      if (event.key === "Escape") closeSettingsRef.current();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -155,18 +201,35 @@ export function PhoneChat() {
   function closeSettings() {
     setSettingsOpen(false);
     setSetupDismissed(true);
+    if (!historyMarker.current) return;
+    historyMarker.current = false;
+    history.back();
   }
 
+  closeSettingsRef.current = closeSettings;
+
   function speak(text: string) {
-    if (!getChatState().voiceOn || !window.speechSynthesis) return;
+    const synth = window.speechSynthesis;
+    if (!getChatState().voiceOn || !synth) return;
     const spoken = speakableText(text);
     if (!spoken) return;
-    window.speechSynthesis.cancel();
+    stopSpeechKeepAlive();
+    synth.cancel();
     const utterance = new SpeechSynthesisUtterance(spoken);
     utterance.lang = "es-CO";
     const voice = pickSpanishVoice();
     if (voice) utterance.voice = voice;
-    window.speechSynthesis.speak(utterance);
+    utterance.onend = () => stopSpeechKeepAlive();
+    utterance.onerror = () => stopSpeechKeepAlive();
+    synth.speak(utterance);
+    speechKeepAlive = window.setInterval(() => {
+      if (!synth.speaking) {
+        stopSpeechKeepAlive();
+        return;
+      }
+      synth.pause();
+      synth.resume();
+    }, 8000);
   }
 
   async function send(text: string) {
@@ -182,6 +245,7 @@ export function PhoneChat() {
     }
 
     window.speechSynthesis?.cancel();
+    primeSpeech();
     sendingRef.current = true;
     setSending(true);
     setError(null);
@@ -214,14 +278,15 @@ export function PhoneChat() {
     recognitionRef.current?.stop();
   }
 
-  function startListening() {
+  function startListening(lang: string = SPEECH_LANGS[0]) {
     const Ctor = recognitionCtor();
     if (!Ctor || sendingRef.current) return;
 
     window.speechSynthesis?.cancel();
+    primeSpeech();
     setError(null);
     const recognition = new Ctor();
-    recognition.lang = "es-CO";
+    recognition.lang = lang;
     recognition.interimResults = true;
     recognition.continuous = false;
     recognition.onresult = (event) => {
@@ -232,6 +297,14 @@ export function PhoneChat() {
       updateDraft(text.trim());
     };
     recognition.onerror = (event) => {
+      if (event.error === "language-not-supported") {
+        const nextLang = fallbackSpeechLang(lang);
+        sendOnEndRef.current = false;
+        if (nextLang) {
+          window.setTimeout(() => startListening(nextLang), 0);
+          return;
+        }
+      }
       sendOnEndRef.current = false;
       const message = speechError(event.error);
       if (message) setError(message);
@@ -304,12 +377,16 @@ export function PhoneChat() {
   }
 
   return (
-    <div ref={rootRef} className="fixed inset-x-0 top-0 z-10 flex h-dvh touch-manipulation flex-col bg-sand text-ink">
+    <div ref={rootRef} className="fixed inset-x-0 top-0 z-10 flex h-dvh touch-manipulation flex-col overscroll-none bg-sand text-ink [color-scheme:light]">
       <header
-        className="grid grid-cols-[4.5rem_minmax(0,1fr)_5.5rem] items-center bg-navy px-3 text-white"
-        style={{ paddingTop: "max(0.5rem, env(safe-area-inset-top))", paddingBottom: "0.5rem" }}
+        className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center bg-navy text-white"
+        style={{
+          ...sideInset,
+          paddingTop: "max(0.75rem, env(safe-area-inset-top))",
+          paddingBottom: "0.5rem",
+        }}
       >
-        <Link href="/" className="text-sm font-medium text-white/80">
+        <Link href="/" className="inline-flex h-12 items-center text-sm font-medium text-white/80">
           Inicio
         </Link>
         <h1 className="truncate text-center font-display text-2xl font-bold uppercase leading-none tracking-[0.14em]">
@@ -318,7 +395,7 @@ export function PhoneChat() {
         <div className="flex justify-end">
           <button
             type="button"
-            className="grid h-11 w-11 place-items-center rounded-full text-white/90"
+            className="grid h-12 w-12 place-items-center rounded-full text-white/90"
             aria-pressed={store.voiceOn}
             aria-label={store.voiceOn ? "Silenciar respuestas" : "Escuchar respuestas"}
             onClick={toggleVoice}
@@ -327,7 +404,7 @@ export function PhoneChat() {
           </button>
           <button
             type="button"
-            className="grid h-11 w-11 place-items-center rounded-full text-white/90"
+            className="grid h-12 w-12 place-items-center rounded-full text-white/90"
             aria-label="Ajustes"
             onClick={() => {
               setKeyDraft(getChatState().apiKey);
@@ -339,7 +416,7 @@ export function PhoneChat() {
         </div>
       </header>
 
-      <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
+      <div className="flex-1 space-y-3 overflow-y-auto overscroll-contain py-4" style={sideInset}>
         {store.ready && store.messages.length === 0 ? (
           <div className="mx-auto max-w-sm pt-10 text-center">
             <p className="font-display text-4xl font-bold uppercase tracking-[0.08em] text-navy">
@@ -376,18 +453,23 @@ export function PhoneChat() {
       </div>
 
       {notice ? (
-        <p className="mx-4 mb-2 rounded-xl border border-line bg-card px-3 py-2 text-sm text-muted">{notice}</p>
+        <p className="mb-2 rounded-xl border border-line bg-card px-3 py-2 text-sm text-muted" style={sideInset}>
+          {notice}
+        </p>
       ) : null}
       {error ? (
-        <p role="alert" className="mx-4 mb-2 rounded-xl bg-[#f8ebe6] px-3 py-2 text-sm text-[#6e332c]">
+        <p role="alert" className="mb-2 rounded-xl bg-[#f8ebe6] px-3 py-2 text-sm text-[#6e332c]" style={sideInset}>
           {error}
         </p>
       ) : null}
 
       <form
         onSubmit={onSubmit}
-        className="border-t border-line bg-card px-3 pt-3"
-        style={{ paddingBottom: "max(0.75rem, env(safe-area-inset-bottom))" }}
+        className="border-t border-line bg-card pt-3"
+        style={{
+          ...sideInset,
+          paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))",
+        }}
       >
         {listening ? (
           <p className="mb-2 text-center text-sm font-medium text-brand">Te escucho…</p>
@@ -401,7 +483,7 @@ export function PhoneChat() {
             aria-label={listening ? "Detener y enviar" : "Hablar"}
             aria-pressed={listening}
             disabled={!store.speechSupported || sending}
-            onClick={listening ? stopListening : startListening}
+            onClick={listening ? stopListening : () => startListening()}
           >
             {listening ? <FaStop /> : <FaMicrophone />}
           </button>
@@ -442,8 +524,11 @@ export function PhoneChat() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="ajustes-titulo"
-            className="max-h-full min-h-0 w-full max-w-md overflow-y-auto rounded-t-3xl bg-card p-5 sm:rounded-3xl"
-            style={{ paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))" }}
+            className="max-h-full min-h-0 w-full max-w-md overflow-y-auto rounded-t-3xl bg-card py-5 sm:rounded-3xl"
+            style={{
+              ...sideInset,
+              paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))",
+            }}
             onClick={(event) => event.stopPropagation()}
           >
             <h2
@@ -485,21 +570,21 @@ export function PhoneChat() {
             <div className="mt-4 flex flex-wrap gap-2">
               <button
                 type="button"
-                className="h-11 rounded-full bg-navy px-4 text-sm font-semibold text-white"
+                className="h-12 rounded-full bg-navy px-4 text-sm font-semibold text-white"
                 onClick={saveKey}
               >
                 Guardar
               </button>
               <button
                 type="button"
-                className="h-11 rounded-full border border-line px-4 text-sm font-semibold text-ink"
+                className="h-12 rounded-full border border-line px-4 text-sm font-semibold text-ink"
                 onClick={forgetKey}
               >
                 Quitar clave
               </button>
               <button
                 type="button"
-                className="h-11 rounded-full border border-line px-4 text-sm font-semibold text-ink"
+                className="h-12 rounded-full border border-line px-4 text-sm font-semibold text-ink"
                 onClick={clearChat}
               >
                 Borrar chat
@@ -507,7 +592,7 @@ export function PhoneChat() {
             </div>
             <button
               type="button"
-              className="mt-4 h-11 w-full rounded-full border border-line text-sm font-semibold text-ink"
+              className="mt-4 h-12 w-full rounded-full border border-line text-sm font-semibold text-ink"
               onClick={closeSettings}
             >
               Cerrar
