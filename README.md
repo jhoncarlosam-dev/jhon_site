@@ -13,6 +13,8 @@ npm run dev
 
 El texto (ofertas, caso Café Marrón, experiencia) está en [`data/resume.ts`](data/resume.ts).
 
+El CV en inglés está en `/cv`. La prueba de plataforma de contenido está en [`proof/content-platform`](proof/content-platform/README.md).
+
 ## Build
 
 ```bash
