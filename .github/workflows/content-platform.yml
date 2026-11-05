@@ -1,0 +1,31 @@
+name: content-platform
+
+on:
+  push:
+    paths:
+      - "proof/content-platform/**"
+      - ".github/workflows/content-platform.yml"
+  pull_request:
+    paths:
+      - "proof/content-platform/**"
+      - ".github/workflows/content-platform.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: proof/content-platform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: proof/content-platform/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - run: npm run build

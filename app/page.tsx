@@ -6,6 +6,7 @@ import { Experience } from "@/components/sections/Experience";
 import { Offers } from "@/components/sections/Offers";
 import { Process } from "@/components/sections/Process";
 import { Skills } from "@/components/sections/Skills";
+import { PlatformProof } from "@/components/sections/PlatformProof";
 import { Work } from "@/components/sections/Work";
 
 export default function Home() {
@@ -16,6 +17,7 @@ export default function Home() {
         <About />
         <Offers />
         <Work />
+        <PlatformProof />
         <Process />
         <Experience />
         <Skills />

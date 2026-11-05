@@ -41,6 +41,15 @@ export type CaseStudy = {
   after: string[];
 };
 
+export type PlatformProof = {
+  name: string;
+  role: string;
+  summary: string;
+  href: string;
+  cvHref: string;
+  points: string[];
+};
+
 export type SkillIcon = {
   name: string;
   icon:
@@ -86,6 +95,7 @@ export const resume = {
     { id: "inicio", label: "Inicio" },
     { id: "ofertas", label: "Ofertas" },
     { id: "trabajo", label: "Trabajo" },
+    { id: "prueba", label: "Prueba" },
     { id: "proceso", label: "Proceso" },
     { id: "experiencia", label: "Experiencia" },
     { id: "stack", label: "Stack" },
@@ -166,7 +176,7 @@ export const resume = {
   caseStudy: {
     name: "Café Marrón",
     href: "https://cafemarron.co/",
-    role: "Rediseño fullstack",
+    role: "Sitio de presentación",
     summary:
       "Café artesanal y orgánico de la finca El Cacique Cínera, en Arboledas. Lo fundó Cristian Acevedo en 2024. El sitio tenía una plantilla genérica; hoy cuenta el origen, las presentaciones y el pedido por WhatsApp.",
     before:
@@ -177,6 +187,21 @@ export const resume = {
       "Favicon de grano y un contador de visitas que sí suma en todos los navegadores",
     ],
   } satisfies CaseStudy,
+  platformProof: {
+    name: "Portico",
+    role: "Prueba de portafolio · 2026",
+    summary:
+      "Un recorte de plataforma de contenido, armado para mostrar el stack de una oferta fullstack con foco en backend: servicio Node, REST, GraphQL, páginas en Next.js y pruebas automatizadas. No es un contrato con un cliente ni un espacio de Contentstack.",
+    href: "https://github.com/jhoncarlosam-dev/jhon_site/tree/main/proof/content-platform",
+    cvHref: "/cv",
+    points: [
+      "Express en TypeScript sirve la misma página por REST y GraphQL, con caché de corta duración.",
+      "Next.js pinta la portada en el servidor y deja las historias estáticas desde el modelo de contenido.",
+      "Bloques modulares, formulario dinámico, referencia a un autor y una migración de esquema v1 a v2.",
+      "Experimento A/B estable y un segmento de suscriptor después de enviar el formulario.",
+      "Jest, React Testing Library y Playwright. ESLint, Prettier y GitHub Actions.",
+    ],
+  } satisfies PlatformProof,
   process: [
     {
       step: "01",
